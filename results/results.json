@@ -1,0 +1,33 @@
+{
+  "project": "Cross-Lingual Phonetic Adapter Speech Recognition",
+  "dataset": "CommonVoice (8 languages)",
+  "languages": ["en", "es", "fr", "de", "ar", "sw", "ta", "bn"],
+  "model": {
+    "base_model": "Whisper",
+    "adapter_type": "phonetic-aware bottleneck adapters",
+    "training_epochs": 50
+  },
+  "training": {
+    "final_train_loss": 5.695,
+    "final_val_loss": 5.970,
+    "total_epochs": 50
+  },
+  "test_aggregate_metrics": {
+    "wer_mean": 100.0,
+    "wer_std": 0.0,
+    "cer_mean": 900.71,
+    "cer_std": 408.68,
+    "per_mean": 1734.32,
+    "per_std": 816.10
+  },
+  "per_language_metrics": {
+    "en": {"wer": 100.0, "cer": 972.62, "per": 1882.03},
+    "es": {"wer": 100.0, "cer": 746.79, "per": 1420.27},
+    "fr": {"wer": 100.0, "cer": 917.74, "per": 1755.62},
+    "de": {"wer": 100.0, "cer": 885.67, "per": 1707.71},
+    "ar": {"wer": 100.0, "cer": 700.91, "per": 1336.03},
+    "sw": {"wer": 100.0, "cer": 1313.75, "per": 2566.90},
+    "ta": {"wer": 100.0, "cer": 939.40, "per": 1817.06},
+    "bn": {"wer": 100.0, "cer": 728.82, "per": 1388.97}
+  }
+}
