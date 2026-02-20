@@ -1,0 +1,99 @@
+# Default configuration for Cross-Lingual Phonetic Adapter ASR
+
+# Model configuration
+model:
+  base_model: "openai/whisper-tiny"
+  num_adapters: 8
+  phonetic_dim: 256
+  adapter_dim: 64
+  adapter_layers: [3, 6, 9, 11]
+  phonetic_contrastive_temp: 0.07
+  freeze_base: true
+
+# Data configuration
+data:
+  languages: ["en", "es", "fr", "de", "ar", "sw", "ta", "bn"]
+  high_resource: ["en", "es", "fr"]
+  low_resource: ["de", "ar", "sw", "ta", "bn"]
+  cache_dir: "./data"
+  sample_rate: 16000
+  max_audio_length: 30.0
+  num_workers: 4
+  train_batch_size: 16
+  eval_batch_size: 32
+  augmentation:
+    time_stretch: true
+    pitch_shift: true
+    add_noise: true
+    time_mask: true
+    freq_mask: true
+
+# Curriculum learning configuration
+curriculum:
+  enabled: true
+  stages:
+    - name: "vowels"
+      duration_epochs: 10
+      phonetic_complexity: 1
+    - name: "simple_consonants"
+      duration_epochs: 10
+      phonetic_complexity: 2
+    - name: "consonant_clusters"
+      duration_epochs: 15
+      phonetic_complexity: 3
+    - name: "full_complexity"
+      duration_epochs: 15
+      phonetic_complexity: 4
+
+# Training configuration
+training:
+  num_epochs: 50
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  warmup_steps: 1000
+  max_grad_norm: 1.0
+  gradient_accumulation_steps: 2
+  mixed_precision: true
+  optimizer: "adamw"
+  scheduler: "cosine"
+  scheduler_params:
+    eta_min: 0.000001
+    T_max: 50
+
+# Loss weights
+loss_weights:
+  asr_loss: 1.0
+  phonetic_contrastive_loss: 0.5
+  adapter_regularization: 0.01
+
+# Early stopping
+early_stopping:
+  enabled: true
+  patience: 10
+  min_delta: 0.001
+  monitor: "val_wer"
+  mode: "min"
+
+# Checkpoint configuration
+checkpoint:
+  save_dir: "./models"
+  save_best_only: true
+  save_frequency: 1
+
+# Evaluation configuration
+evaluation:
+  metrics: ["wer", "cer", "per", "bleu"]
+  compute_per_language: true
+  zero_shot_languages: []
+
+# Logging configuration
+logging:
+  log_dir: "./logs"
+  log_interval: 100
+  use_mlflow: true
+  use_tensorboard: true
+  experiment_name: "phonetic_adapter_asr"
+
+# Reproducibility
+seed: 42
+deterministic: true

@@ -1,0 +1,87 @@
+# Ablation study: Baseline without phonetic adapters and curriculum learning
+
+# Model configuration - NO phonetic adapters
+model:
+  base_model: "openai/whisper-tiny"
+  num_adapters: 0  # Disabled for ablation
+  phonetic_dim: 0  # Disabled for ablation
+  adapter_dim: 0
+  adapter_layers: []
+  phonetic_contrastive_temp: 0.07
+  freeze_base: false  # Fine-tune full model instead
+
+# Data configuration
+data:
+  languages: ["en", "es", "fr", "de", "ar", "sw", "ta", "bn"]
+  high_resource: ["en", "es", "fr"]
+  low_resource: ["de", "ar", "sw", "ta", "bn"]
+  cache_dir: "./data"
+  sample_rate: 16000
+  max_audio_length: 30.0
+  num_workers: 4
+  train_batch_size: 16
+  eval_batch_size: 32
+  augmentation:
+    time_stretch: true
+    pitch_shift: true
+    add_noise: true
+    time_mask: true
+    freq_mask: true
+
+# Curriculum learning - DISABLED for ablation
+curriculum:
+  enabled: false
+  stages: []
+
+# Training configuration
+training:
+  num_epochs: 50
+  learning_rate: 0.00005  # Lower LR for full fine-tuning
+  weight_decay: 0.01
+  warmup_steps: 1000
+  max_grad_norm: 1.0
+  gradient_accumulation_steps: 2
+  mixed_precision: true
+  optimizer: "adamw"
+  scheduler: "cosine"
+  scheduler_params:
+    eta_min: 0.000001
+    T_max: 50
+
+# Loss weights - only ASR loss
+loss_weights:
+  asr_loss: 1.0
+  phonetic_contrastive_loss: 0.0  # Disabled
+  adapter_regularization: 0.0  # Disabled
+
+# Early stopping
+early_stopping:
+  enabled: true
+  patience: 10
+  min_delta: 0.001
+  monitor: "val_wer"
+  mode: "min"
+
+# Checkpoint configuration
+checkpoint:
+  save_dir: "./models"
+  save_best_only: true
+  save_frequency: 1
+
+# Evaluation configuration
+evaluation:
+  metrics: ["wer", "cer", "per", "bleu"]
+  compute_per_language: true
+  zero_shot_languages: []
+
+# Logging configuration
+logging:
+  log_dir: "./logs"
+  log_interval: 100
+  use_mlflow: true
+  use_tensorboard: true
+  experiment_name: "baseline_ablation"
+
+# Reproducibility
+seed: 42
+deterministic: true
